@@ -1,10 +1,10 @@
+"use client";
+
 import React, {
   useEffect,
   useMemo,
   useState,
 } from "react";
-
-import "./styles.css";
 
 import Header from "./components/Header";
 import Hero from "./components/Hero";
