@@ -9,19 +9,8 @@ export function useProducts() {
     try {
       const raw = localStorage.getItem("gamershop-products");
       const stored = raw ? JSON.parse(raw) : null;
-
-      setProducts(
-        Array.isArray(stored)
-          ? stored
-          : SEED_PRODUCTS
-      );
-
-      if (!stored) {
-        localStorage.setItem(
-          "gamershop-products",
-          JSON.stringify(SEED_PRODUCTS)
-        );
-      }
+      setProducts(Array.isArray(stored) ? stored : SEED_PRODUCTS);
+      if (!stored) localStorage.setItem("gamershop-products", JSON.stringify(SEED_PRODUCTS));
     } catch {
       setProducts(SEED_PRODUCTS);
     }
@@ -30,22 +19,11 @@ export function useProducts() {
   const persist = (next) => {
     setProducts(next);
     setSaving(true);
-
     try {
-      localStorage.setItem(
-        "gamershop-products",
-        JSON.stringify(next)
-      );
-    } catch {
-      // Guardado best-effort
-    } finally {
-      setSaving(false);
-    }
+      localStorage.setItem("gamershop-products", JSON.stringify(next));
+    } catch {}
+    setSaving(false);
   };
 
-  return {
-    products,
-    persist,
-    saving,
-  };
+  return { products, persist, saving };
 }
