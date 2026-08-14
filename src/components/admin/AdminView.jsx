@@ -1,13 +1,70 @@
-import { useState } from "react";
-import { Plus, LogOut, Pencil, Trash2, ImageOff } from "lucide-react";
+import { useState, useRef } from "react";
+import { Plus, LogOut, Pencil, Trash2, ImageOff, FileSpreadsheet } from "lucide-react";
+import * as XLSX from "xlsx";
 import ProductForm from "./ProductForm";
 import { catInfo, fmt } from "../../utils/helpers";
 
 export default function AdminView({ products, onCreate, onUpdate, onDelete, saving, onLogout }) {
   const [editing, setEditing] = useState(null);
+  const fileInputRef = useRef(null);
 
   const totalStock = products.reduce((t, p) => t + p.stock, 0);
   const totalValue = products.reduce((t, p) => t + p.price * p.stock, 0);
+
+  // --- LÓGICA DE CARGUE MASIVO CON EXCEL ---
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const data = new Uint8Array(evt.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        
+        // Convertir la hoja a JSON
+        const rawJson = XLSX.utils.sheet_to_json(worksheet);
+
+        // Mapear y validar la estructura de productos
+        const newProducts = rawJson.map((item) => {
+          // Si el usuario pone "mouse.png", lo convertimos a "/images/mouse.png"
+          let imageName = item.image ? String(item.image).trim() : "";
+          if (imageName && !imageName.startsWith("/")) {
+            imageName = `/images/${imageName}`;
+          }
+
+          return {
+            name: item.name ? String(item.name).trim() : "Producto sin nombre",
+            category: item.category ? String(item.category).trim().toLowerCase() : "accesorios",
+            price: Number(item.price) || 0,
+            stock: Number(item.stock) || 0,
+            image: imageName,
+            description: item.description ? String(item.description).trim() : "",
+          };
+        });
+
+        if (newProducts.length === 0) {
+          alert("El archivo Excel no contiene datos o la estructura es inválida.");
+          return;
+        }
+
+        // ✅ Cargar todos los productos juntos enviando el array completo
+        onCreate(newProducts);
+        alert(`¡Éxito! Se cargaron ${newProducts.length} productos al inventario.`);
+
+      } catch (err) {
+        console.error("Error al procesar el archivo Excel:", err);
+        alert("Ocurrió un error al leer el archivo. Revisa que sea un formato .xlsx válido.");
+      } finally {
+        // Limpiar el input para permitir volver a subir el mismo archivo si es necesario
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+  };
 
   if (editing) {
     return (
@@ -36,10 +93,30 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
           </div>
         </div>
 
-        <div className="gs-row">
+        <div className="gs-row" style={{ gap: 10 }}>
+          {/* Input oculto para subir archivo */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            accept=".xlsx, .xls"
+            style={{ display: "none" }}
+          />
+
+          {/* Botón Cargue Masivo */}
+          <button 
+            className="gs-btn-ghost gs-row" 
+            onClick={() => fileInputRef.current?.click()}
+            title="Cargar productos en lote desde un archivo Excel"
+          >
+            <FileSpreadsheet size={15} color="#107C41" /> Cargue masivo
+          </button>
+
+          {/* Botón Cargar Producto Individual */}
           <button className="gs-btn-primary gs-row" onClick={() => setEditing("new")}>
             <Plus size={15} /> Cargar producto
           </button>
+
           <button className="gs-btn-ghost gs-row" onClick={onLogout}>
             <LogOut size={14} /> Salir
           </button>

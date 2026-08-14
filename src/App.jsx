@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import Hero from "./components/Hero";
 import ProductCard from "./components/ProductCard";
 import ProductModal from "./components/ProductModal";
+import SupportModal from "./components/SupportModal";
 import CartDrawer from "./components/CartDrawer";
 import Toast from "./components/Toast";
 import AdminLogin from "./components/admin/AdminLogin";
@@ -13,6 +14,7 @@ import { useProducts } from "./hooks/useProducts";
 
 export default function App() {
   const { products, persist, saving } = useProducts();
+  const [supportOpen, setSupportOpen] = useState(false);
   const [view, setView] = useState("store");
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState("all");
@@ -120,7 +122,10 @@ export default function App() {
 
       {view === "store" ? (
         <>
-          <Hero onViewProducts={() => document.getElementById("gs-products")?.scrollIntoView({ behavior: "smooth", block: "start" })} />
+          <Hero 
+            onViewProducts={() => document.getElementById("gs-products")?.scrollIntoView({ behavior: "smooth", block: "start" })} 
+            onOpenSupport={() => setSupportOpen(true)}
+          />
 
           <main id="gs-products" className="gs-container gs-section">
             <div className="gs-section-head">
@@ -158,7 +163,15 @@ export default function App() {
           products={products}
           saving={saving}
           onLogout={handleLogout}
-          onCreate={(data) => persist([...products, { ...data, id: "p-" + Date.now() }])}
+          onCreate={(data) => {
+            // Acepta un solo producto u un array para cargue masivo
+            const itemsToAdd = Array.isArray(data) ? data : [data];
+            const newItems = itemsToAdd.map((item, index) => ({
+              ...item,
+              id: "p-" + (Date.now() + index),
+            }));
+            persist([...products, ...newItems]);
+          }}
           onUpdate={(id, data) => persist(products.map((p) => (p.id === id ? { ...data, id } : p)))}
           onDelete={(id) => persist(products.filter((p) => p.id !== id))}
         />
@@ -166,7 +179,9 @@ export default function App() {
         <AdminLogin onSuccess={() => { setIsAdmin(true); setView("admin"); }} />
       )}
 
+      {/* --- MODALES Y SOBREPUESTOS --- */}
       <ProductModal product={openProduct} onClose={() => setOpenProduct(null)} onAddToCart={addToCart} />
+      <SupportModal open={supportOpen} onClose={() => setSupportOpen(false)} />
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} cart={cart} updateQty={updateQty} removeItem={removeItem} total={cartTotal} onCheckout={checkout} />
       <Toast message={toast} />
     </div>
