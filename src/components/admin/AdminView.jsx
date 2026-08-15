@@ -11,7 +11,7 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
   const totalStock = products.reduce((t, p) => t + p.stock, 0);
   const totalValue = products.reduce((t, p) => t + p.price * p.stock, 0);
 
-  // --- LÓGICA DE CARGUE MASIVO CON EXCEL ---
+  // --- LÓGICA DE CARGUE MASIVO CON EXCEL CORREGIDA ---
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -27,21 +27,30 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
         // Convertir la hoja a JSON
         const rawJson = XLSX.utils.sheet_to_json(worksheet);
 
-        // Mapear y validar la estructura de productos
-        const newProducts = rawJson.map((item) => {
-          // Si el usuario pone "mouse.png", lo convertimos a "/images/mouse.png"
+        // Mapear, asignar ID y formatear descripción
+        const newProducts = rawJson.map((item, index) => {
           let imageName = item.image ? String(item.image).trim() : "";
           if (imageName && !imageName.startsWith("/")) {
             imageName = `/images/${imageName}`;
           }
 
+          // Formatear la descripción agregando saltos de línea antes de características clave
+          let rawDescription = item.description ? String(item.description).trim() : "";
+          const regexSpecs = /(N\/P\s*:|Pantalla\s*:|Procesador\s*:|Memoria\s*:|Disco Duro\s*:|Cámara\s*:|Puertos Traseros|Puertos Laterales|Sistema Operativo\s*:|Keyboard|Garantía\s*:|\d+\.\s+)/gi;
+          const formattedDescription = rawDescription
+            .replace(regexSpecs, '\n$1')
+            .trim();
+
           return {
+            // ✅ Asignación de ID para prevenir errores en actualización
+            id: item.id ? String(item.id) : "p-" + (Date.now() + index),
             name: item.name ? String(item.name).trim() : "Producto sin nombre",
             category: item.category ? String(item.category).trim().toLowerCase() : "accesorios",
             price: Number(item.price) || 0,
             stock: Number(item.stock) || 0,
             image: imageName,
-            description: item.description ? String(item.description).trim() : "",
+            description: formattedDescription,
+            specs: Array.isArray(item.specs) ? item.specs : [],
           };
         });
 
@@ -50,7 +59,7 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
           return;
         }
 
-        // ✅ Cargar todos los productos juntos enviando el array completo
+        // Cargar todos los productos juntos
         onCreate(newProducts);
         alert(`¡Éxito! Se cargaron ${newProducts.length} productos al inventario.`);
 
@@ -58,7 +67,6 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
         console.error("Error al procesar el archivo Excel:", err);
         alert("Ocurrió un error al leer el archivo. Revisa que sea un formato .xlsx válido.");
       } finally {
-        // Limpiar el input para permitir volver a subir el mismo archivo si es necesario
         if (fileInputRef.current) fileInputRef.current.value = "";
       }
     };
@@ -94,7 +102,6 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
         </div>
 
         <div className="gs-row" style={{ gap: 10 }}>
-          {/* Input oculto para subir archivo */}
           <input
             type="file"
             ref={fileInputRef}
@@ -103,7 +110,6 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
             style={{ display: "none" }}
           />
 
-          {/* Botón Cargue Masivo */}
           <button 
             className="gs-btn-ghost gs-row" 
             onClick={() => fileInputRef.current?.click()}
@@ -112,7 +118,6 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
             <FileSpreadsheet size={15} color="#107C41" /> Cargue masivo
           </button>
 
-          {/* Botón Cargar Producto Individual */}
           <button className="gs-btn-primary gs-row" onClick={() => setEditing("new")}>
             <Plus size={15} /> Cargar producto
           </button>

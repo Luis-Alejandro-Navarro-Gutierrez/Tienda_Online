@@ -163,13 +163,29 @@ export default function App() {
           products={products}
           saving={saving}
           onLogout={handleLogout}
-          onCreate={(data) => {
-            // Acepta un solo producto u un array para cargue masivo
+         onCreate={(data) => {
+            // Acepta un solo producto o un array para cargue masivo
             const itemsToAdd = Array.isArray(data) ? data : [data];
-            const newItems = itemsToAdd.map((item, index) => ({
-              ...item,
-              id: "p-" + (Date.now() + index),
-            }));
+            
+            const newItems = itemsToAdd.map((item, index) => {
+              // --- NUEVO: Formateo de la descripción ---
+              // Usamos el nombre de la propiedad de tu producto (puede ser 'description' o 'descripcion')
+              const textoOriginal = item.description || ""; 
+              
+              // Expresión regular para separar las características comunes
+              const regex = /(Pantalla\s*:|Procesador\s*:|Memoria\s*:|Disco Duro\s*:|Cámara\s*:|Puertos Traseros|Puertos Laterales|Sistema Operativo\s*:|Garantía\s*:)/gi;
+              
+              // Inserta un salto de línea antes de cada coincidencia encontrada
+              const textoFormateado = textoOriginal.replace(regex, '\n$1').trim();
+              // -----------------------------------------
+
+              return {
+                ...item,
+                description: textoFormateado, // Guardamos el texto ya corregido
+                id: "p-" + (Date.now() + index),
+              };
+            });
+            
             persist([...products, ...newItems]);
           }}
           onUpdate={(id, data) => persist(products.map((p) => (p.id === id ? { ...data, id } : p)))}

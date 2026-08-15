@@ -13,14 +13,29 @@ export default function ProductCard({ product, onOpen }) {
           <div className="gs-ph"><Package size={34} color="var(--muted)" /></div>
         )}
 
-        <span className="gs-tag gs-tag-topleft" style={{ background: cat.color + "18", color: cat.color, border: `1px solid ${cat.color}44` }}>
+        {/* Etiqueta con fondo blanco sólido y borde/texto neón para evitar transparencias */}
+        <span 
+          className="gs-tag gs-tag-topleft" 
+          style={{ 
+            background: "#ffffff", 
+            color: cat.color, 
+            border: `1px solid ${cat.color}`, 
+            zIndex: 2 
+          }}
+        >
           {cat.label}
         </span>
 
         {product.stock <= 3 && product.stock > 0 && (
-          <span className="gs-tag gs-tag-topright gs-tag-low">Últimas {product.stock}</span>
+          <span className="gs-tag gs-tag-topright gs-tag-low" style={{ background: "#ffffff", zIndex: 2 }}>
+            Últimas {product.stock}
+          </span>
         )}
-        {product.stock === 0 && <span className="gs-tag gs-tag-topright gs-tag-out">Agotado</span>}
+        {product.stock === 0 && (
+          <span className="gs-tag gs-tag-topright gs-tag-out" style={{ background: "#ffffff", zIndex: 2 }}>
+            Agotado
+          </span>
+        )}
       </div>
 
       <div className="gs-card-info">

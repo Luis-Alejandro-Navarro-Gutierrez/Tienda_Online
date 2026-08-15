@@ -23,7 +23,11 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
             </div>
 
             <h2 className="gs-display" style={{ fontSize: 24, fontWeight: 700, marginTop: 12 }}>{product.name}</h2>
-            <p className="gs-muted" style={{ fontSize: 14, marginTop: 8, lineHeight: 1.5 }}>{product.description}</p>
+            
+            {/* Se agrega whiteSpace: "pre-line" para respetar los saltos de línea */}
+            <p className="gs-muted" style={{ fontSize: 14, marginTop: 8, lineHeight: 1.5, whiteSpace: "pre-line" }}>
+              {product.description}
+            </p>
 
             {product.specs?.length > 0 && (
               <div className="gs-col gs-gap-6" style={{ marginTop: 16 }}>
