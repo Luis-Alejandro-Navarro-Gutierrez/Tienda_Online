@@ -163,33 +163,33 @@ export default function App() {
           products={products}
           saving={saving}
           onLogout={handleLogout}
-         onCreate={(data) => {
-            // Acepta un solo producto o un array para cargue masivo
+          onCreate={(data) => {
             const itemsToAdd = Array.isArray(data) ? data : [data];
             
             const newItems = itemsToAdd.map((item, index) => {
-              // --- NUEVO: Formateo de la descripción ---
-              // Usamos el nombre de la propiedad de tu producto (puede ser 'description' o 'descripcion')
               const textoOriginal = item.description || ""; 
-              
-              // Expresión regular para separar las características comunes
               const regex = /(Pantalla\s*:|Procesador\s*:|Memoria\s*:|Disco Duro\s*:|Cámara\s*:|Puertos Traseros|Puertos Laterales|Sistema Operativo\s*:|Garantía\s*:)/gi;
-              
-              // Inserta un salto de línea antes de cada coincidencia encontrada
               const textoFormateado = textoOriginal.replace(regex, '\n$1').trim();
-              // -----------------------------------------
 
               return {
                 ...item,
-                description: textoFormateado, // Guardamos el texto ya corregido
-                id: "p-" + (Date.now() + index),
+                description: textoFormateado,
+                id: item.id || ("p-" + (Date.now() + index)),
               };
             });
             
             persist([...products, ...newItems]);
           }}
           onUpdate={(id, data) => persist(products.map((p) => (p.id === id ? { ...data, id } : p)))}
-          onDelete={(id) => persist(products.filter((p) => p.id !== id))}
+          onDelete={(target) => {
+            if (Array.isArray(target)) {
+              // Filtrado para arreglo de IDs (borrado por lote)
+              persist(products.filter((p) => !target.includes(p.id)));
+            } else {
+              // Filtrado para un solo ID
+              persist(products.filter((p) => p.id !== target));
+            }
+          }}
         />
       ) : (
         <AdminLogin onSuccess={() => { setIsAdmin(true); setView("admin"); }} />

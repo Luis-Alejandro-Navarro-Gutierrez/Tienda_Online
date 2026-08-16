@@ -6,12 +6,41 @@ import { catInfo, fmt } from "../../utils/helpers";
 
 export default function AdminView({ products, onCreate, onUpdate, onDelete, saving, onLogout }) {
   const [editing, setEditing] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
   const fileInputRef = useRef(null);
 
   const totalStock = products.reduce((t, p) => t + p.stock, 0);
   const totalValue = products.reduce((t, p) => t + p.price * p.stock, 0);
 
-  // --- LÓGICA DE CARGUE MASIVO CON EXCEL CORREGIDA ---
+  // --- LÓGICA DE SELECCIÓN MÚLTIPLE ---
+  const isAllSelected = products.length > 0 && selectedIds.length === products.length;
+
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedIds(products.map((p) => p.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+
+    const count = selectedIds.length;
+    if (confirm(`¿Estás seguro de que deseas eliminar ${count} producto(s) seleccionado(s)?`)) {
+      // ✅ Envía el arreglo completo de IDs seleccionados al onDelete de App.jsx
+      onDelete(selectedIds);
+      setSelectedIds([]);
+    }
+  };
+
+  // --- LÓGICA DE CARGUE MASIVO CON EXCEL ---
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -23,18 +52,15 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
         const workbook = XLSX.read(data, { type: "array" });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        
-        // Convertir la hoja a JSON
+
         const rawJson = XLSX.utils.sheet_to_json(worksheet);
 
-        // Mapear, asignar ID y formatear descripción
         const newProducts = rawJson.map((item, index) => {
           let imageName = item.image ? String(item.image).trim() : "";
           if (imageName && !imageName.startsWith("/")) {
             imageName = `/images/${imageName}`;
           }
 
-          // Formatear la descripción agregando saltos de línea antes de características clave
           let rawDescription = item.description ? String(item.description).trim() : "";
           const regexSpecs = /(N\/P\s*:|Pantalla\s*:|Procesador\s*:|Memoria\s*:|Disco Duro\s*:|Cámara\s*:|Puertos Traseros|Puertos Laterales|Sistema Operativo\s*:|Keyboard|Garantía\s*:|\d+\.\s+)/gi;
           const formattedDescription = rawDescription
@@ -42,7 +68,6 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
             .trim();
 
           return {
-            // ✅ Asignación de ID para prevenir errores en actualización
             id: item.id ? String(item.id) : "p-" + (Date.now() + index),
             name: item.name ? String(item.name).trim() : "Producto sin nombre",
             category: item.category ? String(item.category).trim().toLowerCase() : "accesorios",
@@ -59,7 +84,6 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
           return;
         }
 
-        // Cargar todos los productos juntos
         onCreate(newProducts);
         alert(`¡Éxito! Se cargaron ${newProducts.length} productos al inventario.`);
 
@@ -102,6 +126,16 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
         </div>
 
         <div className="gs-row" style={{ gap: 10 }}>
+          {selectedIds.length > 0 && (
+            <button
+              className="gs-btn-ghost gs-row"
+              onClick={handleBulkDelete}
+              style={{ color: "var(--danger)", border: "1px solid var(--danger)", background: "#fff0f0" }}
+            >
+              <Trash2 size={15} /> Eliminar ({selectedIds.length})
+            </button>
+          )}
+
           <input
             type="file"
             ref={fileInputRef}
@@ -131,13 +165,37 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
       <div className="gs-scrollbar" style={{ overflowX: "auto", border: "1px solid var(--line)", borderRadius: 12 }}>
         <table className="gs-table">
           <thead>
-            <tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th></th></tr>
+            <tr>
+              <th style={{ width: 40, textAlign: "center" }}>
+                <input
+                  type="checkbox"
+                  checked={isAllSelected}
+                  onChange={handleSelectAll}
+                  style={{ cursor: "pointer", width: 16, height: 16 }}
+                />
+              </th>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th></th>
+            </tr>
           </thead>
           <tbody>
             {products.map((product) => {
               const cat = catInfo(product.category);
+              const isSelected = selectedIds.includes(product.id);
+
               return (
-                <tr key={product.id}>
+                <tr key={product.id} style={{ backgroundColor: isSelected ? "var(--bg-hover, #f8f9fa)" : "transparent" }}>
+                  <td style={{ textAlign: "center" }}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => handleSelectOne(product.id)}
+                      style={{ cursor: "pointer", width: 16, height: 16 }}
+                    />
+                  </td>
                   <td>
                     <div className="gs-row">
                       <div className="gs-imgwrap" style={{ width: 40, height: 40, borderRadius: 6, flexShrink: 0 }}>
