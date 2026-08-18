@@ -1,4 +1,4 @@
-# GamerShop
+# NavaTech
 
 Proyecto React + Next.js (App Router). Migrado desde Vite.
 
