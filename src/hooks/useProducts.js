@@ -16,8 +16,13 @@ export function useProducts() {
       if (error) throw error;
 
       if (data && data.length === 0) {
-        await supabase.from("products").insert(SEED_PRODUCTS);
-        setProducts(SEED_PRODUCTS);
+        const { data: insertedData, error: insertError } = await supabase
+          .from("products")
+          .insert(SEED_PRODUCTS)
+          .select();
+        
+        if (insertError) throw insertError;
+        setProducts(insertedData || SEED_PRODUCTS);
       } else {
         setProducts(data);
       }
@@ -55,7 +60,7 @@ export function useProducts() {
     const idsToDelete = Array.isArray(target) ? target.map(String) : [String(target)];
 
     // 1. Actualización optimista de la UI
-    setProducts((prev) => prev.filter((p) => !idsToDelete.includes(String(p.id))));
+    setProducts((prev) => (prev ? prev.filter((p) => !idsToDelete.includes(String(p.id))) : []));
     setSaving(true);
 
     try {

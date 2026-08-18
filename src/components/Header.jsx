@@ -10,59 +10,69 @@ export default function Header({
   setQuery,
   activeCat,
   setActiveCat,
+  onLogout,
 }) {
+  const handleAdminToggle = () => {
+    if (view === "admin") {
+      if (onLogout) onLogout();
+      setView("store");
+    } else {
+      setView("admin");
+    }
+  };
+
   return (
-    <header className="gs-header">
-      <div className="gs-container">
+    <header className="nt-header">
+      <div className="nt-container">
         {/* Barra superior */}
-        <div className="gs-header-top">
+        <div className="nt-header-top">
           {/* Brand/Logo */}
           <div
-            className="gs-brand"
+            className="nt-brand"
             onClick={() => {
+              if (view === "admin" && onLogout) onLogout();
               setView("store");
               setActiveCat("all");
             }}
           >
-            <div className="gs-brand-icon">
-              {/* Si la imagen está en public/favicon.png usa "/favicon.png" */}
-              {/* Si está en public/images/favicon.png usa "/images/favicon.png" */}
+            <div className="nt-brand-icon">
               <img 
                 src="/images/favicon.png" 
                 alt="NavaTech Logo" 
                 style={{ width: 30, height: 30, objectFit: "contain" }} 
               />
             </div>
-            <div className="gs-brand-name">
+            <div className="nt-brand-name">
               Nava<span>Tech</span>
             </div>
           </div>
 
           {/* Buscador */}
-          <div className="gs-search">
+          <div className="nt-search">
             <Search size={16} color="#8C8AA3" />
             <input
               placeholder="Buscar productos..."
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
+                if (view === "admin" && onLogout) onLogout();
                 setView("store");
               }}
             />
           </div>
 
           {/* Acciones principales */}
-          <div className="gs-header-actions">
+          <div className="nt-header-actions">
             <button
-              className="gs-btn-ghost gs-row"
-              onClick={() => setView(view === "admin" ? "store" : "admin")}
+              className="nt-btn-ghost nt-row"
+              onClick={handleAdminToggle}
             >
               <Lock size={14} color="#0891B2" />
               <span>{view === "admin" ? "Ver tienda" : "Panel admin"}</span>
             </button>
 
             <button
-              className="gs-btn-ghost gs-row"
+              className="nt-btn-ghost nt-row"
               onClick={onOpenCart}
               style={{ position: "relative" }}
             >
@@ -90,9 +100,9 @@ export default function Header({
 
         {/* Navegación por categorías */}
         {view === "store" && (
-          <nav className="gs-header-nav gs-scrollbar">
+          <nav className="nt-header-nav nt-scrollbar">
             <button
-              className={"gs-nav-pill" + (activeCat === "all" ? " active" : "")}
+              className={"nt-nav-pill" + (activeCat === "all" ? " active" : "")}
               onClick={() => setActiveCat("all")}
             >
               Todo
@@ -102,7 +112,7 @@ export default function Header({
               <button
                 key={c.id}
                 className={
-                  "gs-nav-pill" + (activeCat === c.id ? " active" : "")
+                  "nt-nav-pill" + (activeCat === c.id ? " active" : "")
                 }
                 onClick={() => setActiveCat(c.id)}
               >

@@ -108,7 +108,7 @@ export default function AdminView({ products = [], onCreate, onUpdate, onDelete,
 
   if (editing) {
     return (
-      <div className="gs-page-narrow">
+      <div className="nt-page-narrow">
         <ProductForm
           initial={editing === "new" ? null : editing}
           onCancel={() => setEditing(null)}
@@ -123,20 +123,20 @@ export default function AdminView({ products = [], onCreate, onUpdate, onDelete,
   }
 
   return (
-    <div className="gs-page">
-      <div className="gs-row-between" style={{ alignItems: "flex-end", marginBottom: 22, flexWrap: "wrap", gap: 12 }}>
+    <div className="nt-page">
+      <div className="nt-row-between" style={{ alignItems: "flex-end", marginBottom: 22, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <div className="gs-display" style={{ fontSize: 22, fontWeight: 700 }}>Panel de inventario</div>
-          <div className="gs-muted" style={{ fontSize: 13.5, marginTop: 4 }}>
+          <div className="nt-display" style={{ fontSize: 22, fontWeight: 700 }}>Panel de inventario</div>
+          <div className="nt-muted" style={{ fontSize: 13.5, marginTop: 4 }}>
             {products.length} productos · {totalStock} unidades en stock · valor total {fmt(totalValue)}
             {saving && " · guardando…"}
           </div>
         </div>
 
-        <div className="gs-row" style={{ gap: 10, flexWrap: "wrap" }}>
+        <div className="nt-row" style={{ gap: 10, flexWrap: "wrap" }}>
           {selectedIds.length > 0 && (
             <button
-              className="gs-btn-ghost gs-row"
+              className="nt-btn-ghost nt-row"
               onClick={handleBulkDelete}
               style={{ color: "var(--danger)", border: "1px solid var(--danger)", background: "#fff0f0" }}
             >
@@ -153,25 +153,25 @@ export default function AdminView({ products = [], onCreate, onUpdate, onDelete,
           />
 
           <button 
-            className="gs-btn-ghost gs-row" 
+            className="nt-btn-ghost nt-row" 
             onClick={() => fileInputRef.current?.click()}
             title="Cargar productos en lote desde un archivo Excel"
           >
             <FileSpreadsheet size={15} color="#107C41" /> Cargue masivo
           </button>
 
-          <button className="gs-btn-primary gs-row" onClick={() => setEditing("new")}>
+          <button className="nt-btn-primary nt-row" onClick={() => setEditing("new")}>
             <Plus size={15} /> Cargar producto
           </button>
 
-          <button className="gs-btn-ghost gs-row" onClick={onLogout}>
+          <button className="nt-btn-ghost nt-row" onClick={onLogout}>
             <LogOut size={14} /> Salir
           </button>
         </div>
       </div>
 
-      <div className="gs-scrollbar" style={{ overflowX: "auto", border: "1px solid var(--line)", borderRadius: 12 }}>
-        <table className="gs-table">
+      <div className="nt-scrollbar" style={{ overflowX: "auto", border: "1px solid var(--line)", borderRadius: 12 }}>
+        <table className="nt-table">
           <thead>
             <tr>
               <th style={{ width: 40, textAlign: "center" }}>
@@ -213,23 +213,23 @@ export default function AdminView({ products = [], onCreate, onUpdate, onDelete,
                       />
                     </td>
                     <td>
-                      <div className="gs-row">
-                        <div className="gs-imgwrap" style={{ width: 40, height: 40, borderRadius: 6, flexShrink: 0 }}>
+                      <div className="nt-row">
+                        <div className="nt-imgwrap" style={{ width: 40, height: 40, borderRadius: 6, flexShrink: 0 }}>
                           {product.image ? <img src={product.image} alt={product.name} /> : <ImageOff size={14} color="var(--muted)" />}
                         </div>
                         <span style={{ fontWeight: 600 }}>{product.name}</span>
                       </div>
                     </td>
-                    <td><span className="gs-tag" style={{ background: cat.color + "18", color: cat.color }}>{cat.label}</span></td>
-                    <td className="gs-mono">{fmt(product.price)}</td>
-                    <td className="gs-mono" style={{ color: product.stock === 0 ? "var(--danger)" : "inherit" }}>{product.stock}</td>
+                    <td><span className="nt-tag" style={{ background: cat.color + "18", color: cat.color }}>{cat.label}</span></td>
+                    <td className="nt-mono">{fmt(product.price)}</td>
+                    <td className="nt-mono" style={{ color: product.stock === 0 ? "var(--danger)" : "inherit" }}>{product.stock}</td>
                     <td>
-                      <div className="gs-row" style={{ gap: 6 }}>
-                        <button className="gs-btn-ghost" style={{ padding: 7 }} onClick={() => setEditing(product)}>
+                      <div className="nt-row" style={{ gap: 6 }}>
+                        <button className="nt-btn-ghost" style={{ padding: 7 }} onClick={() => setEditing(product)}>
                           <Pencil size={13} />
                         </button>
                         <button
-                          className="gs-btn-ghost"
+                          className="nt-btn-ghost"
                           style={{ padding: 7 }}
                           onClick={() => handleSingleDelete(product.id, product.name)}
                         >

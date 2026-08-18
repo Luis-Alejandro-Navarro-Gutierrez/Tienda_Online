@@ -28,42 +28,42 @@ export default function ProductForm({ initial, onSave, onCancel }) {
   const valid = form.name.trim() && form.price !== "" && form.stock !== "";
 
   return (
-    <div className="gs-panel">
-      <div className="gs-display" style={{ fontWeight: 700, fontSize: 16, marginBottom: 16 }}>
+    <div className="nt-panel">
+      <div className="nt-display" style={{ fontWeight: 700, fontSize: 16, marginBottom: 16 }}>
         {initial ? "Editar producto" : "Nuevo producto"}
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-        <div className="gs-full">
-          <label className="gs-label">Nombre del producto</label>
-          <input className="gs-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ej. Monitor Arc 27 QHD" />
+        <div className="nt-full">
+          <label className="nt-label">Nombre del producto</label>
+          <input className="nt-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ej. Monitor Arc 27 QHD" />
         </div>
 
         <div>
-          <label className="gs-label">Categoría</label>
-          <select className="gs-input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+          <label className="nt-label">Categoría</label>
+          <select className="nt-input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
             {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
           </select>
         </div>
 
         <div>
-          <label className="gs-label">Stock disponible</label>
-          <input className="gs-input" type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} placeholder="0" />
+          <label className="nt-label">Stock disponible</label>
+          <input className="nt-input" type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} placeholder="0" />
         </div>
 
-        <div className="gs-full">
-          <label className="gs-label">Precio (COP)</label>
-          <input className="gs-input" type="number" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="0" />
+        <div className="nt-full">
+          <label className="nt-label">Precio (COP)</label>
+          <input className="nt-input" type="number" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="0" />
         </div>
 
-        <div className="gs-full">
-          <label className="gs-label">Descripción</label>
-          <textarea className="gs-input" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Descripción breve y clara del producto…" />
+        <div className="nt-full">
+          <label className="nt-label">Descripción</label>
+          <textarea className="nt-input" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Descripción breve y clara del producto…" />
         </div>
 
-        <div className="gs-full">
-          <label className="gs-label">Imagen del producto</label>
-          <div className="gs-dropzone" onClick={() => fileRef.current?.click()}>
+        <div className="nt-full">
+          <label className="nt-label">Imagen del producto</label>
+          <div className="nt-dropzone" onClick={() => fileRef.current?.click()}>
             {form.image ? (
               <img src={form.image} alt="preview" style={{ width: 90, height: 90, objectFit: "cover", borderRadius: 8 }} />
             ) : (
@@ -73,27 +73,27 @@ export default function ProductForm({ initial, onSave, onCancel }) {
           <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => handleImage(e.target.files?.[0])} />
         </div>
 
-        <div className="gs-full">
-          <label className="gs-label">Características técnicas</label>
-          <div className="gs-col gs-gap-6">
+        <div className="nt-full">
+          <label className="nt-label">Características técnicas</label>
+          <div className="nt-col nt-gap-6">
             {form.specs.map((spec, i) => (
-              <div key={i} className="gs-row">
-                <input className="gs-input" placeholder="Ej. RAM" value={spec.label} onChange={(e) => setSpec(i, "label", e.target.value)} />
-                <input className="gs-input" placeholder="Ej. 16GB" value={spec.value} onChange={(e) => setSpec(i, "value", e.target.value)} />
-                <button type="button" className="gs-btn-ghost" style={{ padding: "8px 10px" }} onClick={() => removeSpec(i)}><X size={14} /></button>
+              <div key={i} className="nt-row">
+                <input className="nt-input" placeholder="Ej. RAM" value={spec.label} onChange={(e) => setSpec(i, "label", e.target.value)} />
+                <input className="nt-input" placeholder="Ej. 16GB" value={spec.value} onChange={(e) => setSpec(i, "value", e.target.value)} />
+                <button type="button" className="nt-btn-ghost" style={{ padding: "8px 10px" }} onClick={() => removeSpec(i)}><X size={14} /></button>
               </div>
             ))}
-            <button type="button" className="gs-btn-ghost" style={{ alignSelf: "flex-start", fontSize: 13 }} onClick={addSpec}>
+            <button type="button" className="nt-btn-ghost" style={{ alignSelf: "flex-start", fontSize: 13 }} onClick={addSpec}>
               + Agregar característica
             </button>
           </div>
         </div>
       </div>
 
-      <div className="gs-row" style={{ marginTop: 20, justifyContent: "flex-end" }}>
-        <button className="gs-btn-ghost" onClick={onCancel}>Cancelar</button>
+      <div className="nt-row" style={{ marginTop: 20, justifyContent: "flex-end" }}>
+        <button className="nt-btn-ghost" onClick={onCancel}>Cancelar</button>
         <button
-          className="gs-btn-primary"
+          className="nt-btn-primary"
           disabled={!valid}
           onClick={() => onSave({ ...form, price: Number(form.price) || 0, stock: Number(form.stock) || 0, specs: form.specs.filter((s) => s.label && s.value) })}
         >

@@ -11,9 +11,9 @@ import Toast from "./components/Toast";
 import AdminLogin from "./components/admin/AdminLogin";
 import AdminView from "./components/admin/AdminView";
 import { useProducts } from "./hooks/useProducts";
+import { supabase } from "./lib/supabase";
 
 export default function App() {
-  // 1. Extraemos 'remove' del hook
   const { products, persist, remove, saving } = useProducts();
   
   const [supportOpen, setSupportOpen] = useState(false);
@@ -23,7 +23,8 @@ export default function App() {
   const [openProduct, setOpenProduct] = useState(null);
   const [cart, setCart] = useState(() => {
     try {
-      const raw = localStorage.getItem("gamershop-cart");
+      // Cambio de clave en localStorage a navatech-cart
+      const raw = localStorage.getItem("navatech-cart");
       return raw ? JSON.parse(raw) : [];
     } catch {
       return [];
@@ -34,12 +35,18 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [sessionChecked, setSessionChecked] = useState(false);
 
-  // Sesión de administrador
+  // Escuchar la sesión en tiempo real desde Supabase Auth
   useEffect(() => {
-    try {
-      if (localStorage.getItem("gamershop-admin-session") === "true") setIsAdmin(true);
-    } catch {}
-    setSessionChecked(true);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAdmin(!!session);
+      setSessionChecked(true);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAdmin(!!session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   // Auto-ocultar toast
@@ -49,19 +56,18 @@ export default function App() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  // Guardar carrito
+  // Guardar carrito con la nueva clave de la marca
   useEffect(() => {
     try {
-      localStorage.setItem("gamershop-cart", JSON.stringify(cart));
+      localStorage.setItem("navatech-cart", JSON.stringify(cart));
     } catch {}
   }, [cart]);
 
-  const handleLogout = () => {
+  // Manejador de cierre de sesión seguro con Supabase
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     setIsAdmin(false);
     setView("store");
-    try {
-      localStorage.removeItem("gamershop-admin-session");
-    } catch {}
   };
 
   const addToCart = (product, qty) => {
@@ -120,6 +126,7 @@ export default function App() {
         setQuery={setQuery}
         activeCat={activeCat}
         setActiveCat={setActiveCat}
+        onLogout={handleLogout}
       />
 
       {view === "store" ? (
@@ -185,7 +192,6 @@ export default function App() {
           onUpdate={(id, data) => 
             persist(products.map((p) => (String(p.id) === String(id) ? { ...data, id: String(id) } : p)))
           }
-          // 2. Usamos 'remove' directamente para ejecutar DELETE en Supabase
           onDelete={(target) => remove(target)}
         />
       ) : (

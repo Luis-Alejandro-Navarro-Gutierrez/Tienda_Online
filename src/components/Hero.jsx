@@ -10,17 +10,16 @@ const BENEFITS = [
 export default function Hero({ onViewProducts, onOpenSupport }) {
   return (
     <>
-      <section className="gs-hero">
-        <div className="gs-container" style={{ position: "relative", width: "min(1400px, calc(100% - 48px))" }}>
+      <section className="nt-hero">
+        <div className="nt-container" style={{ position: "relative", width: "min(1400px, calc(100% - 48px))" }}>
           
           {/* Contenido Principal */}
-          <div className="gs-hero-content">
-            <div className="gs-kicker">CATÁLOGO EN VIVO · MEDELLÍN</div>
+          <div className="nt-hero-content">
+            <div className="nt-kicker">CATÁLOGO EN VIVO · MEDELLÍN</div>
             
             <h1>
               Tecnología de 
               <br /><em>confianza</em>
-             
             </h1>
             
             <p>
@@ -29,13 +28,13 @@ export default function Hero({ onViewProducts, onOpenSupport }) {
             </p>
 
             {/* Acciones principales */}
-            <div className="gs-hero-buttons">
-              <button className="gs-btn-primary gs-row" onClick={onViewProducts}>
+            <div className="nt-hero-buttons">
+              <button className="nt-btn-primary nt-row" onClick={onViewProducts}>
                 <span>Ver productos</span>
                 <ChevronRight size={16} />
               </button>
 
-              <button className="gs-btn-ghost gs-row" onClick={onOpenSupport}>
+              <button className="nt-btn-ghost nt-row" onClick={onOpenSupport}>
                 <Headphones size={16} color="var(--purple)" />
                 <span>Soporte Técnico</span>
               </button>
@@ -43,19 +42,19 @@ export default function Hero({ onViewProducts, onOpenSupport }) {
           </div>
 
           {/* Imagen de Apoyo */}
-          <div className="gs-hero-art" aria-hidden="true">
-            <img src="/images/gamer-setup.png" alt="Gamer Setup" />
+          <div className="nt-hero-art" aria-hidden="true">
+            <img src="/images/gamer-setup.png" alt="Tech Setup" />
           </div>
 
         </div>
       </section>
 
       {/* Barra de Beneficios */}
-      <div className="gs-container" style={{ marginTop: "-1px" }}>
-        <div className="gs-benefits">
+      <div className="nt-container" style={{ marginTop: "-1px" }}>
+        <div className="nt-benefits">
           {BENEFITS.map(({ icon: Icon, title, text }) => (
-            <div className="gs-benefit" key={title}>
-              <Icon className="gs-benefit-icon" size={26} />
+            <div className="nt-benefit" key={title}>
+              <Icon className="nt-benefit-icon" size={26} />
               <div>
                 <strong>{title}</strong>
                 <span>{text}</span>

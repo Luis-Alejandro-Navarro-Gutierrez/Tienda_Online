@@ -6,22 +6,22 @@ export default function SupportModal({ open, onClose }) {
   const whatsappUrl = "https://wa.me/573015194439?text=Hola%20Camilo,%20necesito%20soporte%20t%C3%A9cnico%20especializado";
 
   return (
-    <div className="gs-modal" onClick={onClose}>
+    <div className="nt-modal" onClick={onClose}>
       <div 
-        className="gs-modal-card" 
+        className="nt-modal-card" 
         style={{ maxWidth: 420, padding: 24, margin: "0 16px" }} 
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="gs-row-between" style={{ marginBottom: 16 }}>
-          <div className="gs-row">
-            <div className="gs-brand-icon" style={{ width: 34, height: 34 }}>
+        <div className="nt-row-between" style={{ marginBottom: 16 }}>
+          <div className="nt-row">
+            <div className="nt-brand-icon" style={{ width: 34, height: 34 }}>
               <Headphones size={18} color="#fff" />
             </div>
             <strong style={{ fontSize: 18, fontFamily: "Space Grotesk" }}>
               Soporte Técnico
             </strong>
           </div>
-          <button className="gs-btn-icon" onClick={onClose}>
+          <button className="nt-btn-icon" onClick={onClose}>
             <X size={20} />
           </button>
         </div>
@@ -37,7 +37,7 @@ export default function SupportModal({ open, onClose }) {
             gap: 6 
           }}
         >
-          <div className="gs-stock" style={{ alignSelf: "flex-start" }}>
+          <div className="nt-stock" style={{ alignSelf: "flex-start" }}>
             ● Atención Directa & Especializada
           </div>
 
@@ -48,7 +48,7 @@ export default function SupportModal({ open, onClose }) {
             Soporte técnico especializado
           </span>
 
-          <div className="gs-row" style={{ marginTop: 10, fontSize: 13, color: "var(--text)" }}>
+          <div className="nt-row" style={{ marginTop: 10, fontSize: 13, color: "var(--text)" }}>
             <PhoneCall size={15} color="var(--purple)" />
             <strong>+57 301 519 4439</strong>
           </div>
@@ -58,7 +58,7 @@ export default function SupportModal({ open, onClose }) {
           href={whatsappUrl} 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="gs-btn-primary"
+          className="nt-btn-primary"
           style={{ 
             marginTop: 20, 
             display: "flex", 
