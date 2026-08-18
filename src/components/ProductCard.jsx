@@ -41,10 +41,6 @@ export default function ProductCard({ product, onOpen }) {
       <div className="nt-card-info">
         <div className="nt-card-name">{product.name}</div>
 
-        {product.specs?.[0] && (
-          <div className="nt-mono nt-card-spec">{product.specs[0].label}: {product.specs[0].value}</div>
-        )}
-
         <div className="nt-card-price">{fmt(product.price)}</div>
 
         <div className="nt-stock-row">

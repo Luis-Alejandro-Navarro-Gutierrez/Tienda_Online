@@ -28,11 +28,10 @@ export default function AdminLogin({ onSuccess = () => {} }) {
       }
 
       if (data?.session) {
-        // OPCIONAL: Validar rol en metadatos o tabla 'profiles'
-        const userRole = data.session.user?.user_metadata?.role;
-        
-        // Si manejas roles en app_metadata o user_metadata:
-        if (userRole && userRole !== "admin") {
+        // Validar rol en app_metadata (el usuario no puede editarlo desde el cliente)
+        const userRole = data.session.user?.app_metadata?.role;
+
+        if (userRole !== "admin") {
           await supabase.auth.signOut();
           setError("No tienes permisos suficientes para acceder como administrador.");
           return;
@@ -49,7 +48,7 @@ export default function AdminLogin({ onSuccess = () => {} }) {
 
   return (
     <div style={{ maxWidth: 380, margin: "70px auto", padding: "0 20px" }}>
-      <div className="gs-panel" style={{ textAlign: "center" }}>
+      <div className="nt-panel" style={{ textAlign: "center" }}>
         <div 
           style={{ 
             width: 44, 
@@ -64,19 +63,19 @@ export default function AdminLogin({ onSuccess = () => {} }) {
           <Lock size={19} color="var(--purple)" />
         </div>
 
-        <div className="gs-display" style={{ fontWeight: 700, fontSize: 19 }}>
+        <div className="nt-display" style={{ fontWeight: 700, fontSize: 19 }}>
           Acceso administrador
         </div>
-        <p className="gs-muted" style={{ fontSize: 13.5, marginTop: 6, marginBottom: 20 }}>
+        <p className="nt-muted" style={{ fontSize: 13.5, marginTop: 6, marginBottom: 20 }}>
           Esta sección solo es visible para el equipo de NavaTech.
         </p>
 
         <form onSubmit={handleSubmit} style={{ textAlign: "left" }}>
-          <label className="gs-label" htmlFor="admin-email">Correo electrónico</label>
+          <label className="nt-label" htmlFor="admin-email">Correo electrónico</label>
           <div style={{ position: "relative", marginBottom: 12 }}>
             <input
               id="admin-email"
-              className="gs-input"
+              className="nt-input"
               type="email"
               value={email}
               onChange={(e) => { setEmail(e.target.value); setError(""); }}
@@ -99,11 +98,11 @@ export default function AdminLogin({ onSuccess = () => {} }) {
             </div>
           </div>
 
-          <label className="gs-label" htmlFor="admin-password">Contraseña</label>
+          <label className="nt-label" htmlFor="admin-password">Contraseña</label>
           <div style={{ position: "relative", marginBottom: 12 }}>
             <input
               id="admin-password"
-              className="gs-input"
+              className="nt-input"
               type={show ? "text" : "password"}
               value={password}
               onChange={(e) => { setPassword(e.target.value); setError(""); }}
@@ -137,7 +136,7 @@ export default function AdminLogin({ onSuccess = () => {} }) {
           )}
 
           <button
-            className="gs-btn-primary"
+            className="nt-btn-primary"
             type="submit"
             style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", gap: 8 }}
             disabled={!email.trim() || !password || loading}

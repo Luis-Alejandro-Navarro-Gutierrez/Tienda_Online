@@ -83,7 +83,6 @@ export default function AdminView({ products = [], onCreate, onUpdate, onDelete,
             stock: Number(item.stock) || 0,
             image: imageName,
             description: formattedDescription,
-            specs: Array.isArray(item.specs) ? item.specs : [],
           };
         });
 

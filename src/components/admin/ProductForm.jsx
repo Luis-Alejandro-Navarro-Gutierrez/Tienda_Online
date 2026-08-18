@@ -1,11 +1,11 @@
 import { useRef, useState } from "react";
-import { Upload, X } from "lucide-react";
+import { Upload } from "lucide-react";
 import { CATEGORIES } from "../../data/products";
 
-const emptyForm = { name: "", category: "computadores", price: "", stock: "", description: "", specs: [{ label: "", value: "" }], image: null };
+const emptyForm = { name: "", category: "computadores", price: "", stock: "", description: "", image: null };
 
 export default function ProductForm({ initial, onSave, onCancel }) {
-  const [form, setForm] = useState(initial || emptyForm);
+  const [form, setForm] = useState(initial ? { ...emptyForm, ...initial } : emptyForm);
   const fileRef = useRef(null);
 
   const handleImage = (file) => {
@@ -14,16 +14,6 @@ export default function ProductForm({ initial, onSave, onCancel }) {
     reader.onload = () => setForm((f) => ({ ...f, image: reader.result }));
     reader.readAsDataURL(file);
   };
-
-  const setSpec = (i, key, value) =>
-    setForm((f) => {
-      const specs = [...f.specs];
-      specs[i] = { ...specs[i], [key]: value };
-      return { ...f, specs };
-    });
-
-  const addSpec = () => setForm((f) => ({ ...f, specs: [...f.specs, { label: "", value: "" }] }));
-  const removeSpec = (i) => setForm((f) => ({ ...f, specs: f.specs.filter((_, idx) => idx !== i) }));
 
   const valid = form.name.trim() && form.price !== "" && form.stock !== "";
 
@@ -73,21 +63,6 @@ export default function ProductForm({ initial, onSave, onCancel }) {
           <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => handleImage(e.target.files?.[0])} />
         </div>
 
-        <div className="nt-full">
-          <label className="nt-label">Características técnicas</label>
-          <div className="nt-col nt-gap-6">
-            {form.specs.map((spec, i) => (
-              <div key={i} className="nt-row">
-                <input className="nt-input" placeholder="Ej. RAM" value={spec.label} onChange={(e) => setSpec(i, "label", e.target.value)} />
-                <input className="nt-input" placeholder="Ej. 16GB" value={spec.value} onChange={(e) => setSpec(i, "value", e.target.value)} />
-                <button type="button" className="nt-btn-ghost" style={{ padding: "8px 10px" }} onClick={() => removeSpec(i)}><X size={14} /></button>
-              </div>
-            ))}
-            <button type="button" className="nt-btn-ghost" style={{ alignSelf: "flex-start", fontSize: 13 }} onClick={addSpec}>
-              + Agregar característica
-            </button>
-          </div>
-        </div>
       </div>
 
       <div className="nt-row" style={{ marginTop: 20, justifyContent: "flex-end" }}>
@@ -95,7 +70,7 @@ export default function ProductForm({ initial, onSave, onCancel }) {
         <button
           className="nt-btn-primary"
           disabled={!valid}
-          onClick={() => onSave({ ...form, price: Number(form.price) || 0, stock: Number(form.stock) || 0, specs: form.specs.filter((s) => s.label && s.value) })}
+          onClick={() => onSave({ ...form, price: Number(form.price) || 0, stock: Number(form.stock) || 0 })}
         >
           Guardar producto
         </button>

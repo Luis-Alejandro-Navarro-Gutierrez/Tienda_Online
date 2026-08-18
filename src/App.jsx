@@ -109,14 +109,14 @@ export default function App() {
 
   if (!products || !sessionChecked) {
     return (
-      <div className="gs-root" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 300 }}>
-        <div className="gs-mono gs-muted">Cargando catálogo…</div>
+      <div className="nt-root" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 300 }}>
+        <div className="nt-mono nt-muted">Cargando catálogo…</div>
       </div>
     );
   }
 
   return (
-    <div className="gs-root">
+    <div className="nt-root">
       <Header
         view={view}
         setView={setView}
@@ -132,17 +132,17 @@ export default function App() {
       {view === "store" ? (
         <>
           <Hero 
-            onViewProducts={() => document.getElementById("gs-products")?.scrollIntoView({ behavior: "smooth", block: "start" })} 
+            onViewProducts={() => document.getElementById("nt-products")?.scrollIntoView({ behavior: "smooth", block: "start" })} 
             onOpenSupport={() => setSupportOpen(true)}
           />
 
-          <main id="gs-products" className="gs-container gs-section">
-            <div className="gs-section-head">
-              <div className="gs-section-title">
+          <main id="nt-products" className="nt-container nt-section">
+            <div className="nt-section-head">
+              <div className="nt-section-title">
                 <span style={{ fontSize: 24 }}>☆</span>
                 Productos destacados
               </div>
-              <span className="gs-mono" style={{ fontSize: 10, color: "#A8A6C4" }}>
+              <span className="nt-mono" style={{ fontSize: 10, color: "#A8A6C4" }}>
                 {filtered.length} productos
               </span>
             </div>
@@ -152,15 +152,15 @@ export default function App() {
                 No encontramos productos que coincidan con tu búsqueda.
               </div>
             ) : (
-              <div className="gs-grid">
+              <div className="nt-grid">
                 {filtered.map((p) => (
                   <ProductCard key={p.id} product={p} onOpen={setOpenProduct} />
                 ))}
               </div>
             )}
 
-            <div className="gs-footer" style={{ marginTop: 52 }}>
-              <div className="gs-row-between" style={{ flexWrap: "wrap" }}>
+            <div className="nt-footer" style={{ marginTop: 52 }}>
+              <div className="nt-row-between" style={{ flexWrap: "wrap" }}>
                 <div><strong>NavaTech</strong> · tecnología de confianza.</div>
                 <div>Medellín · Envíos nacionales · Soporte real</div>
               </div>

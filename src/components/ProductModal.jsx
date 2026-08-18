@@ -28,17 +28,6 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
               {product.description}
             </p>
 
-            {product.specs?.length > 0 && (
-              <div className="nt-col nt-gap-6" style={{ marginTop: 16 }}>
-                {product.specs.map((spec, i) => (
-                  <div key={i} className="nt-mono nt-spec-row">
-                    <span className="nt-muted">{spec.label}</span>
-                    <span>{spec.value}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
             <div style={{ marginTop: "auto", paddingTop: 20 }}>
               <div className="nt-display" style={{ fontSize: 26, fontWeight: 700, marginBottom: 4 }}>{fmt(product.price)}</div>
               <div style={{ fontSize: 12.5, color: product.stock > 0 ? "var(--muted)" : "var(--danger)", marginBottom: 14 }}>
