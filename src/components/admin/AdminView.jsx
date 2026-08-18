@@ -4,29 +4,38 @@ import * as XLSX from "xlsx";
 import ProductForm from "./ProductForm";
 import { catInfo, fmt } from "../../utils/helpers";
 
-export default function AdminView({ products, onCreate, onUpdate, onDelete, saving, onLogout }) {
+export default function AdminView({ products = [], onCreate, onUpdate, onDelete, saving, onLogout }) {
   const [editing, setEditing] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const fileInputRef = useRef(null);
 
-  const totalStock = products.reduce((t, p) => t + p.stock, 0);
-  const totalValue = products.reduce((t, p) => t + p.price * p.stock, 0);
+  const totalStock = products.reduce((t, p) => t + (Number(p.stock) || 0), 0);
+  const totalValue = products.reduce((t, p) => t + ((Number(p.price) || 0) * (Number(p.stock) || 0)), 0);
 
   // --- LÓGICA DE SELECCIÓN MÚLTIPLE ---
   const isAllSelected = products.length > 0 && selectedIds.length === products.length;
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
-      setSelectedIds(products.map((p) => p.id));
+      setSelectedIds(products.map((p) => String(p.id)));
     } else {
       setSelectedIds([]);
     }
   };
 
   const handleSelectOne = (id) => {
+    const strId = String(id);
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+      prev.includes(strId) ? prev.filter((item) => item !== strId) : [...prev, strId]
     );
+  };
+
+  const handleSingleDelete = (id, name) => {
+    if (confirm(`¿Eliminar "${name}" del inventario?`)) {
+      const strId = String(id);
+      onDelete(strId);
+      setSelectedIds((prev) => prev.filter((item) => item !== strId));
+    }
   };
 
   const handleBulkDelete = () => {
@@ -34,7 +43,6 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
 
     const count = selectedIds.length;
     if (confirm(`¿Estás seguro de que deseas eliminar ${count} producto(s) seleccionado(s)?`)) {
-      // ✅ Envía el arreglo completo de IDs seleccionados al onDelete de App.jsx
       onDelete(selectedIds);
       setSelectedIds([]);
     }
@@ -57,7 +65,7 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
 
         const newProducts = rawJson.map((item, index) => {
           let imageName = item.image ? String(item.image).trim() : "";
-          if (imageName && !imageName.startsWith("/")) {
+          if (imageName && !imageName.startsWith("/") && !imageName.startsWith("http")) {
             imageName = `/images/${imageName}`;
           }
 
@@ -116,7 +124,7 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
 
   return (
     <div className="gs-page">
-      <div className="gs-row-between" style={{ alignItems: "flex-end", marginBottom: 22, flexWrap: "wrap" }}>
+      <div className="gs-row-between" style={{ alignItems: "flex-end", marginBottom: 22, flexWrap: "wrap", gap: 12 }}>
         <div>
           <div className="gs-display" style={{ fontSize: 22, fontWeight: 700 }}>Panel de inventario</div>
           <div className="gs-muted" style={{ fontSize: 13.5, marginTop: 4 }}>
@@ -125,7 +133,7 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
           </div>
         </div>
 
-        <div className="gs-row" style={{ gap: 10 }}>
+        <div className="gs-row" style={{ gap: 10, flexWrap: "wrap" }}>
           {selectedIds.length > 0 && (
             <button
               className="gs-btn-ghost gs-row"
@@ -182,46 +190,57 @@ export default function AdminView({ products, onCreate, onUpdate, onDelete, savi
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => {
-              const cat = catInfo(product.category);
-              const isSelected = selectedIds.includes(product.id);
+            {products.length === 0 ? (
+              <tr>
+                <td colSpan={6} style={{ textAlign: "center", padding: "30px 0", color: "var(--muted)" }}>
+                  No hay productos registrados en el inventario.
+                </td>
+              </tr>
+            ) : (
+              products.map((product) => {
+                const cat = catInfo(product.category);
+                const strId = String(product.id);
+                const isSelected = selectedIds.includes(strId);
 
-              return (
-                <tr key={product.id} style={{ backgroundColor: isSelected ? "var(--bg-hover, #f8f9fa)" : "transparent" }}>
-                  <td style={{ textAlign: "center" }}>
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => handleSelectOne(product.id)}
-                      style={{ cursor: "pointer", width: 16, height: 16 }}
-                    />
-                  </td>
-                  <td>
-                    <div className="gs-row">
-                      <div className="gs-imgwrap" style={{ width: 40, height: 40, borderRadius: 6, flexShrink: 0 }}>
-                        {product.image ? <img src={product.image} alt={product.name} /> : <ImageOff size={14} color="var(--muted)" />}
+                return (
+                  <tr key={strId} style={{ backgroundColor: isSelected ? "var(--bg-hover, #f8f9fa)" : "transparent" }}>
+                    <td style={{ textAlign: "center" }}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handleSelectOne(strId)}
+                        style={{ cursor: "pointer", width: 16, height: 16 }}
+                      />
+                    </td>
+                    <td>
+                      <div className="gs-row">
+                        <div className="gs-imgwrap" style={{ width: 40, height: 40, borderRadius: 6, flexShrink: 0 }}>
+                          {product.image ? <img src={product.image} alt={product.name} /> : <ImageOff size={14} color="var(--muted)" />}
+                        </div>
+                        <span style={{ fontWeight: 600 }}>{product.name}</span>
                       </div>
-                      <span style={{ fontWeight: 600 }}>{product.name}</span>
-                    </div>
-                  </td>
-                  <td><span className="gs-tag" style={{ background: cat.color + "18", color: cat.color }}>{cat.label}</span></td>
-                  <td className="gs-mono">{fmt(product.price)}</td>
-                  <td className="gs-mono" style={{ color: product.stock === 0 ? "var(--danger)" : "inherit" }}>{product.stock}</td>
-                  <td>
-                    <div className="gs-row" style={{ gap: 6 }}>
-                      <button className="gs-btn-ghost" style={{ padding: 7 }} onClick={() => setEditing(product)}><Pencil size={13} /></button>
-                      <button
-                        className="gs-btn-ghost"
-                        style={{ padding: 7 }}
-                        onClick={() => { if (confirm(`¿Eliminar "${product.name}" del inventario?`)) onDelete(product.id); }}
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
+                    </td>
+                    <td><span className="gs-tag" style={{ background: cat.color + "18", color: cat.color }}>{cat.label}</span></td>
+                    <td className="gs-mono">{fmt(product.price)}</td>
+                    <td className="gs-mono" style={{ color: product.stock === 0 ? "var(--danger)" : "inherit" }}>{product.stock}</td>
+                    <td>
+                      <div className="gs-row" style={{ gap: 6 }}>
+                        <button className="gs-btn-ghost" style={{ padding: 7 }} onClick={() => setEditing(product)}>
+                          <Pencil size={13} />
+                        </button>
+                        <button
+                          className="gs-btn-ghost"
+                          style={{ padding: 7 }}
+                          onClick={() => handleSingleDelete(product.id, product.name)}
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>

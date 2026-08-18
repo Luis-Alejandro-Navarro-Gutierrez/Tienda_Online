@@ -13,7 +13,9 @@ import AdminView from "./components/admin/AdminView";
 import { useProducts } from "./hooks/useProducts";
 
 export default function App() {
-  const { products, persist, saving } = useProducts();
+  // 1. Extraemos 'remove' del hook
+  const { products, persist, remove, saving } = useProducts();
+  
   const [supportOpen, setSupportOpen] = useState(false);
   const [view, setView] = useState("store");
   const [query, setQuery] = useState("");
@@ -64,10 +66,10 @@ export default function App() {
 
   const addToCart = (product, qty) => {
     setCart((cur) => {
-      const found = cur.find((i) => i.id === product.id);
+      const found = cur.find((i) => String(i.id) === String(product.id));
       if (found) {
         return cur.map((i) =>
-          i.id === product.id ? { ...i, qty: Math.min(product.stock, i.qty + qty) } : i
+          String(i.id) === String(product.id) ? { ...i, qty: Math.min(product.stock, i.qty + qty) } : i
         );
       }
       return [...cur, { ...product, qty }];
@@ -76,9 +78,9 @@ export default function App() {
   };
 
   const updateQty = (id, qty) =>
-    setCart((cur) => (qty <= 0 ? cur.filter((i) => i.id !== id) : cur.map((i) => (i.id === id ? { ...i, qty } : i))));
+    setCart((cur) => (qty <= 0 ? cur.filter((i) => String(i.id) !== String(id)) : cur.map((i) => (String(i.id) === String(id) ? { ...i, qty } : i))));
 
-  const removeItem = (id) => setCart((cur) => cur.filter((i) => i.id !== id));
+  const removeItem = (id) => setCart((cur) => cur.filter((i) => String(i.id) !== String(id)));
 
   const checkout = () => {
     if (!cart.length) return;
@@ -152,7 +154,7 @@ export default function App() {
 
             <div className="gs-footer" style={{ marginTop: 52 }}>
               <div className="gs-row-between" style={{ flexWrap: "wrap" }}>
-                <div><strong>GamerShop</strong> · tecnología para jugar, trabajar y crear.</div>
+                <div><strong>NavaTech</strong> · tecnología de confianza.</div>
                 <div>Medellín · Envíos nacionales · Soporte real</div>
               </div>
             </div>
@@ -174,22 +176,17 @@ export default function App() {
               return {
                 ...item,
                 description: textoFormateado,
-                id: item.id || ("p-" + (Date.now() + index)),
+                id: item.id ? String(item.id) : ("p-" + (Date.now() + index)),
               };
             });
             
             persist([...products, ...newItems]);
           }}
-          onUpdate={(id, data) => persist(products.map((p) => (p.id === id ? { ...data, id } : p)))}
-          onDelete={(target) => {
-            if (Array.isArray(target)) {
-              // Filtrado para arreglo de IDs (borrado por lote)
-              persist(products.filter((p) => !target.includes(p.id)));
-            } else {
-              // Filtrado para un solo ID
-              persist(products.filter((p) => p.id !== target));
-            }
-          }}
+          onUpdate={(id, data) => 
+            persist(products.map((p) => (String(p.id) === String(id) ? { ...data, id: String(id) } : p)))
+          }
+          // 2. Usamos 'remove' directamente para ejecutar DELETE en Supabase
+          onDelete={(target) => remove(target)}
         />
       ) : (
         <AdminLogin onSuccess={() => { setIsAdmin(true); setView("admin"); }} />

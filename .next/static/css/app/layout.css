@@ -70,9 +70,8 @@ html, body { background: #F5F5FB; overflow-x: hidden; }
 .gs-header-top { height: 72px; display: flex; align-items: center; gap: 28px; }
 .gs-brand { display: flex; align-items: center; gap: 9px; cursor: pointer; flex: 0 0 auto; }
 .gs-brand-icon {
-  width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
-  background: linear-gradient(135deg, #7C3AED, #06B6D4);
-  box-shadow: 0 4px 16px rgba(124,58,237,.28);
+  width: 30px; height: 30px; display: grid; place-items: center;
+  
 }
 .gs-brand-name { font-size: 24px; font-weight: 700; letter-spacing: -.045em; }
 .gs-brand-name span { color: var(--purple); }

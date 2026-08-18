@@ -1,9 +1,13 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "GamerShop",
-  description: "GamerShop — tienda gamer de tecnología y accesorios.",
+  title: "NavaTech",
+  description: "NavaTech — tecnología de confianza.",
+  icons: {
+    icon: "/images/favicon.png", // Coloca tu archivo favicon.png en la carpeta public/
+  },
 };
+
 
 export const viewport = {
   width: "device-width",

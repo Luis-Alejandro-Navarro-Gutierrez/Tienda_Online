@@ -18,13 +18,14 @@ export default function Hero({ onViewProducts, onOpenSupport }) {
             <div className="gs-kicker">CATÁLOGO EN VIVO · MEDELLÍN</div>
             
             <h1>
-              Tecnología <em>pensada</em>
-              <br />para cómo trabajas,
-              <br />juegas y creas.
+              Tecnología de 
+              <br /><em>confianza</em>
+             
             </h1>
             
             <p>
-              Selección curada de equipos y accesorios, con specs reales y stock verificado — sin relleno, sin ruido.
+              Equipos y accesorios, con specs reales y stock verificado
+              <br />sin relleno, sin ruido.
             </p>
 
             {/* Acciones principales */}

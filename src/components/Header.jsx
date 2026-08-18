@@ -1,4 +1,4 @@
-import { ShoppingCart, Search, Lock, Gamepad2 } from "lucide-react";
+import { ShoppingCart, Search, Lock } from "lucide-react";
 import { CATEGORIES } from "../data/products";
 
 export default function Header({
@@ -25,10 +25,16 @@ export default function Header({
             }}
           >
             <div className="gs-brand-icon">
-              <Gamepad2 size={19} color="#fff" />
+              {/* Si la imagen está en public/favicon.png usa "/favicon.png" */}
+              {/* Si está en public/images/favicon.png usa "/images/favicon.png" */}
+              <img 
+                src="/images/favicon.png" 
+                alt="NavaTech Logo" 
+                style={{ width: 30, height: 30, objectFit: "contain" }} 
+              />
             </div>
             <div className="gs-brand-name">
-              Gamer<span>Shop</span>
+              Nava<span>Tech</span>
             </div>
           </div>
 
