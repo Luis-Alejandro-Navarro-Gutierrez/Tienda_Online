@@ -13,8 +13,8 @@ import AdminView from "./components/admin/AdminView";
 import { useProducts } from "./hooks/useProducts";
 import { supabase } from "./lib/supabase";
 
-export default function App() {
-  const { products, persist, remove, saving } = useProducts();
+export default function App({ initialProducts }) {
+  const { products, persist, remove, saving } = useProducts(initialProducts);
   
   const [supportOpen, setSupportOpen] = useState(false);
   const [view, setView] = useState("store");

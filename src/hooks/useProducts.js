@@ -2,12 +2,19 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { SEED_PRODUCTS } from "../data/products";
 
-export function useProducts() {
-  const [products, setProducts] = useState(null);
+export function useProducts(initialProducts) {
+  // Si el servidor ya nos entregó productos (vía page.jsx), arrancamos con
+  // esos datos y evitamos el "Cargando catálogo..." en el primer render.
+  const [products, setProducts] = useState(initialProducts?.length ? initialProducts : null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchProducts();
+    // Si ya vinimos con datos del servidor, no hace falta pedirlos de nuevo
+    // al montar. Si no vinieron (o vinieron vacíos), los pedimos desde el cliente.
+    if (!initialProducts?.length) {
+      fetchProducts();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProducts = async () => {
