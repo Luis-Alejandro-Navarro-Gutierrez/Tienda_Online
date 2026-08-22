@@ -143,18 +143,18 @@ export default function AdminView({ products = [], onCreate, onUpdate, onBulkUpd
         });
 
         const matchedNames = new Set();
-        const updatedProducts = products.map((p) => {
+        const changedRows = [];
+        products.forEach((p) => {
           const key = normalizeName(p.name);
           if (priceMap.has(key)) {
             matchedNames.add(key);
-            return { ...p, price: priceMap.get(key) };
+            changedRows.push({ ...p, price: priceMap.get(key) });
           }
-          return p;
         });
 
         const unmatched = [...priceMap.keys()].filter((key) => !matchedNames.has(key));
 
-        onBulkUpdate(updatedProducts);
+        onBulkUpdate(changedRows);
 
         let msg = `¡Listo! Se actualizó el precio de ${matchedNames.size} producto(s).`;
         if (unmatched.length > 0) {

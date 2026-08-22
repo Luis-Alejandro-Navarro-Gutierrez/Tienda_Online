@@ -14,7 +14,7 @@ import { useProducts } from "./hooks/useProducts";
 import { supabase } from "./lib/supabase";
 
 export default function App({ initialProducts, initialView = "store" }) {
-  const { products, persist, remove, saving } = useProducts(initialProducts);
+  const { products, persistRows, remove, saving } = useProducts(initialProducts);
   
   const [supportOpen, setSupportOpen] = useState(false);
   const [view, setView] = useState(initialView);
@@ -187,12 +187,20 @@ export default function App({ initialProducts, initialView = "store" }) {
               };
             });
             
-            persist([...products, ...newItems]);
+            persistRows(newItems).then((ok) => {
+              if (ok === false) alert("Hubo un error guardando en la base de datos. Revisa tu conexión e intenta de nuevo.");
+            });
           }}
           onUpdate={(id, data) => 
-            persist(products.map((p) => (String(p.id) === String(id) ? { ...data, id: String(id) } : p)))
+            persistRows([{ ...data, id: String(id) }]).then((ok) => {
+              if (ok === false) alert("Hubo un error guardando en la base de datos. Revisa tu conexión e intenta de nuevo.");
+            })
           }
-          onBulkUpdate={(updatedProducts) => persist(updatedProducts)}
+          onBulkUpdate={(changedRows) => 
+            persistRows(changedRows).then((ok) => {
+              if (ok === false) alert("Hubo un error guardando en la base de datos. Revisa tu conexión e intenta de nuevo.");
+            })
+          }
           onDelete={(target) => remove(target)}
         />
       ) : (

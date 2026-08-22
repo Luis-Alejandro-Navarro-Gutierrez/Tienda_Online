@@ -62,6 +62,44 @@ export function useProducts(initialProducts) {
     }
   };
 
+  // Igual que persist(), pero solo envía a Supabase las filas que realmente
+  // cambiaron o son nuevas (rows), en vez de reenviar todo el catálogo con
+  // cada imagen de cada producto en una sola petición gigante. Esto evita
+  // que ediciones individuales (como subir una foto) fallen por el tamaño
+  // del request a medida que crece el inventario.
+  const persistRows = async (rows) => {
+    if (!rows || rows.length === 0) return;
+
+    setProducts((prev) => {
+      const prevList = prev || [];
+      const byId = new Map(prevList.map((p) => [String(p.id), p]));
+      rows.forEach((r) => byId.set(String(r.id), r));
+      return [...byId.values()];
+    });
+
+    setSaving(true);
+    try {
+      const cleanData = rows.map(({ id, name, price, stock, category, description, image }) => ({
+        id: String(id),
+        name,
+        price: Number(price) || 0,
+        stock: Number(stock) || 0,
+        category: category || "",
+        description: description || "",
+        image: image || "",
+      }));
+
+      const { error } = await supabase.from("products").upsert(cleanData, { onConflict: "id" });
+      if (error) throw error;
+      return true;
+    } catch (err) {
+      console.error("Error al guardar en Supabase:", err?.message || err?.details || err);
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // Función para eliminar productos individualmente o por lote en Supabase
   const remove = async (target) => {
     const idsToDelete = Array.isArray(target) ? target.map(String) : [String(target)];
@@ -83,5 +121,5 @@ export function useProducts(initialProducts) {
     }
   };
 
-  return { products, persist, remove, saving, refetch: fetchProducts };
+  return { products, persist, persistRows, remove, saving, refetch: fetchProducts };
 }
