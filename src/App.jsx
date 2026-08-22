@@ -192,6 +192,7 @@ export default function App({ initialProducts }) {
           onUpdate={(id, data) => 
             persist(products.map((p) => (String(p.id) === String(id) ? { ...data, id: String(id) } : p)))
           }
+          onBulkUpdate={(updatedProducts) => persist(updatedProducts)}
           onDelete={(target) => remove(target)}
         />
       ) : (

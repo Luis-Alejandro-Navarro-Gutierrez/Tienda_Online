@@ -2,7 +2,7 @@ import { X, Package, Trash2 } from "lucide-react";
 import { fmt } from "../utils/helpers";
 
 // Número de WhatsApp configurado (Colombia +57)
-const WHATSAPP_PHONE = "573015194439"; 
+const WHATSAPP_PHONE = "573044730989"; 
 
 export default function CartDrawer({ open, onClose, cart, updateQty, removeItem, total, onCheckout }) {
 
