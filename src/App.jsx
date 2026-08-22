@@ -13,11 +13,11 @@ import AdminView from "./components/admin/AdminView";
 import { useProducts } from "./hooks/useProducts";
 import { supabase } from "./lib/supabase";
 
-export default function App({ initialProducts }) {
+export default function App({ initialProducts, initialView = "store" }) {
   const { products, persist, remove, saving } = useProducts(initialProducts);
   
   const [supportOpen, setSupportOpen] = useState(false);
-  const [view, setView] = useState("store");
+  const [view, setView] = useState(initialView);
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState("all");
   const [openProduct, setOpenProduct] = useState(null);

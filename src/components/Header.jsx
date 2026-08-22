@@ -63,13 +63,15 @@ export default function Header({
 
           {/* Acciones principales */}
           <div className="nt-header-actions">
-            <button
-              className="nt-btn-ghost nt-row"
-              onClick={handleAdminToggle}
-            >
-              <Lock size={14} color="#0891B2" />
-              <span>{view === "admin" ? "Ver tienda" : "Panel admin"}</span>
-            </button>
+            {view === "admin" && (
+              <button
+                className="nt-btn-ghost nt-row"
+                onClick={handleAdminToggle}
+              >
+                <Lock size={14} color="#0891B2" />
+                <span>Ver tienda</span>
+              </button>
+            )}
 
             <button
               className="nt-btn-ghost nt-row"
