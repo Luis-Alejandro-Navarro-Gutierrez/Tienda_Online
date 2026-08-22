@@ -105,9 +105,6 @@ export default function AdminView({ products = [], onCreate, onUpdate, onDelete,
     reader.readAsArrayBuffer(file);
   };
 
-    reader.readAsArrayBuffer(file);
-  };
-
   if (editing) {
     return (
       <div className="nt-page-narrow">
