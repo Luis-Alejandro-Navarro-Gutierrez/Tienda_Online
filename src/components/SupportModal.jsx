@@ -14,7 +14,7 @@ export default function SupportModal({ open, onClose }) {
       >
         <div className="nt-row-between" style={{ marginBottom: 16 }}>
           <div className="nt-row">
-            <div className="nt-brand-icon" style={{ width: 34, height: 34 }}>
+            <div className="nt-brand-icon" style={{ width: 34, height: 34, background: "var(--purple)", borderRadius: 9 }}>
               <Headphones size={18} color="#fff" />
             </div>
             <strong style={{ fontSize: 18, fontFamily: "Space Grotesk" }}>
