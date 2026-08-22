@@ -50,7 +50,7 @@ export default function Hero({ onViewProducts, onOpenSupport }) {
       </section>
 
       {/* Barra de Beneficios */}
-      <div className="nt-container" style={{ marginTop: "-1px" }}>
+      <div className="nt-container" style={{ marginTop: "-1px", paddingTop: 38 }}>
         <div className="nt-benefits">
           {BENEFITS.map(({ icon: Icon, title, text }) => (
             <div className="nt-benefit" key={title}>

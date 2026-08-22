@@ -1,22 +1,13 @@
 import { useState, useRef } from "react";
-import { Plus, LogOut, Pencil, Trash2, ImageOff, FileSpreadsheet, Tags } from "lucide-react";
+import { Plus, LogOut, Pencil, Trash2, ImageOff, FileSpreadsheet } from "lucide-react";
 import * as XLSX from "xlsx";
 import ProductForm from "./ProductForm";
 import { catInfo, fmt } from "../../utils/helpers";
 
-// Normaliza nombres para comparar sin fallar por mayúsculas, tildes o espacios extra
-const normalizeName = (str) =>
-  String(str || "")
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-
-export default function AdminView({ products = [], onCreate, onUpdate, onBulkUpdate, onDelete, saving, onLogout }) {
+export default function AdminView({ products = [], onCreate, onUpdate, onDelete, saving, onLogout }) {
   const [editing, setEditing] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const fileInputRef = useRef(null);
-  const priceFileInputRef = useRef(null);
 
   const totalStock = products.reduce((t, p) => t + (Number(p.stock) || 0), 0);
   const totalValue = products.reduce((t, p) => t + ((Number(p.price) || 0) * (Number(p.stock) || 0)), 0);
@@ -114,64 +105,6 @@ export default function AdminView({ products = [], onCreate, onUpdate, onBulkUpd
     reader.readAsArrayBuffer(file);
   };
 
-  // --- LÓGICA DE ACTUALIZACIÓN MASIVA DE PRECIOS (por nombre) ---
-  const handlePriceUpdateFile = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const data = new Uint8Array(evt.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const rawJson = XLSX.utils.sheet_to_json(worksheet);
-
-        if (rawJson.length === 0) {
-          alert("El archivo Excel no contiene datos o la estructura es inválida.");
-          return;
-        }
-
-        // Mapa: nombre normalizado -> nuevo precio
-        const priceMap = new Map();
-        rawJson.forEach((row) => {
-          const key = normalizeName(row.name);
-          if (key && row.price !== undefined && row.price !== "") {
-            priceMap.set(key, Number(row.price) || 0);
-          }
-        });
-
-        const matchedNames = new Set();
-        const changedRows = [];
-        products.forEach((p) => {
-          const key = normalizeName(p.name);
-          if (priceMap.has(key)) {
-            matchedNames.add(key);
-            changedRows.push({ ...p, price: priceMap.get(key) });
-          }
-        });
-
-        const unmatched = [...priceMap.keys()].filter((key) => !matchedNames.has(key));
-
-        onBulkUpdate(changedRows);
-
-        let msg = `¡Listo! Se actualizó el precio de ${matchedNames.size} producto(s).`;
-        if (unmatched.length > 0) {
-          const originalNames = rawJson
-            .filter((row) => unmatched.includes(normalizeName(row.name)))
-            .map((row) => row.name);
-          msg += `\n\nNo se encontró ningún producto con estos nombres (revisa si hay un typo):\n- ${originalNames.join("\n- ")}`;
-        }
-        alert(msg);
-      } catch (err) {
-        console.error("Error al procesar el archivo de precios:", err);
-        alert("Ocurrió un error al leer el archivo. Revisa que sea un formato .xlsx válido.");
-      } finally {
-        if (priceFileInputRef.current) priceFileInputRef.current.value = "";
-      }
-    };
-
     reader.readAsArrayBuffer(file);
   };
 
@@ -220,22 +153,6 @@ export default function AdminView({ products = [], onCreate, onUpdate, onBulkUpd
             accept=".xlsx, .xls"
             style={{ display: "none" }}
           />
-
-          <input
-            type="file"
-            ref={priceFileInputRef}
-            onChange={handlePriceUpdateFile}
-            accept=".xlsx, .xls"
-            style={{ display: "none" }}
-          />
-
-          <button
-            className="nt-btn-ghost nt-row"
-            onClick={() => priceFileInputRef.current?.click()}
-            title="Actualizar solo el precio de productos existentes, buscándolos por nombre"
-          >
-            <Tags size={15} color="var(--purple)" /> Actualizar precios
-          </button>
 
           <button 
             className="nt-btn-ghost nt-row" 

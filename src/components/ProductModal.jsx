@@ -1,9 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Package, Minus, Plus } from "lucide-react";
 import { catInfo, fmt } from "../utils/helpers";
 
 export default function ProductModal({ product, onClose, onAddToCart }) {
   const [qty, setQty] = useState(1);
+
+  // Cada vez que se abre un producto distinto, la cantidad vuelve a 1
+  useEffect(() => {
+    setQty(1);
+  }, [product?.id]);
+
+  // Bloquea el scroll de la página de fondo mientras el modal está abierto
+  useEffect(() => {
+    if (product) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [product]);
+
   if (!product) return null;
 
   const cat = catInfo(product.category);

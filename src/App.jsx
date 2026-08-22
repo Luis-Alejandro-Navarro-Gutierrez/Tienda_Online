@@ -187,18 +187,13 @@ export default function App({ initialProducts, initialView = "store" }) {
               };
             });
             
-            persistRows(newItems).then((ok) => {
-              if (ok === false) alert("Hubo un error guardando en la base de datos. Revisa tu conexión e intenta de nuevo.");
+            persistRows(newItems).then((result) => {
+              if (result !== true) alert("Error al guardar en la base de datos:\n\n" + result);
             });
           }}
           onUpdate={(id, data) => 
-            persistRows([{ ...data, id: String(id) }]).then((ok) => {
-              if (ok === false) alert("Hubo un error guardando en la base de datos. Revisa tu conexión e intenta de nuevo.");
-            })
-          }
-          onBulkUpdate={(changedRows) => 
-            persistRows(changedRows).then((ok) => {
-              if (ok === false) alert("Hubo un error guardando en la base de datos. Revisa tu conexión e intenta de nuevo.");
+            persistRows([{ ...data, id: String(id) }]).then((result) => {
+              if (result !== true) alert("Error al guardar en la base de datos:\n\n" + result);
             })
           }
           onDelete={(target) => remove(target)}

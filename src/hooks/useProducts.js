@@ -93,8 +93,9 @@ export function useProducts(initialProducts) {
       if (error) throw error;
       return true;
     } catch (err) {
-      console.error("Error al guardar en Supabase:", err?.message || err?.details || err);
-      return false;
+      const msg = err?.message || err?.details || String(err);
+      console.error("Error al guardar en Supabase:", msg);
+      return msg; // Devolvemos el mensaje real del error, no solo true/false
     } finally {
       setSaving(false);
     }
