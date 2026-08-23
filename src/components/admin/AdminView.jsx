@@ -3,6 +3,35 @@ import { Plus, LogOut, Pencil, Trash2, ImageOff, FileSpreadsheet } from "lucide-
 import * as XLSX from "xlsx";
 import ProductForm from "./ProductForm";
 import { catInfo, fmt } from "../../utils/helpers";
+import { CATEGORIES } from "../../data/products";
+
+const VALID_CATEGORY_IDS = CATEGORIES.map((c) => c.id);
+
+// Corrige variantes comunes del Excel (singular/plural, sin tilde, etc.)
+// para que coincidan con los ids reales usados por los filtros.
+const CATEGORY_ALIASES = {
+  computador: "computadores",
+  pc: "computadores",
+  componente: "componentes",
+  periferico: "perifericos",
+  perifericos: "perifericos",
+  silla: "mobiliario",
+  sillas: "mobiliario",
+  mesa: "mobiliario",
+  accesorio: "accesorios",
+};
+
+const normalizeCategory = (raw) => {
+  const clean = String(raw || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, ""); // quita tildes: "periféricos" -> "perifericos"
+
+  if (VALID_CATEGORY_IDS.includes(clean)) return clean;
+  if (CATEGORY_ALIASES[clean]) return CATEGORY_ALIASES[clean];
+  return "accesorios"; // si no coincide con nada conocido, cae aquí por defecto
+};
 
 export default function AdminView({ products = [], onCreate, onUpdate, onDelete, saving, onLogout }) {
   const [editing, setEditing] = useState(null);
@@ -78,7 +107,7 @@ export default function AdminView({ products = [], onCreate, onUpdate, onDelete,
           return {
             id: item.id ? String(item.id) : "p-" + (Date.now() + index),
             name: item.name ? String(item.name).trim() : "Producto sin nombre",
-            category: item.category ? String(item.category).trim().toLowerCase() : "accesorios",
+            category: normalizeCategory(item.category),
             price: Number(item.price) || 0,
             stock: Number(item.stock) || 0,
             image: imageName,

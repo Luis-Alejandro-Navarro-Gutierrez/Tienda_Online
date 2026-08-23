@@ -1,18 +1,36 @@
 import { useRef, useState } from "react";
 import { Upload } from "lucide-react";
 import { CATEGORIES } from "../../data/products";
+import { supabase } from "../../lib/supabase";
 
 const emptyForm = { name: "", category: "computadores", price: "", stock: "", description: "", image: null };
 
 export default function ProductForm({ initial, onSave, onCancel }) {
   const [form, setForm] = useState(initial ? { ...emptyForm, ...initial } : emptyForm);
+  const [uploading, setUploading] = useState(false);
   const fileRef = useRef(null);
 
-  const handleImage = (file) => {
+  const handleImage = async (file) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setForm((f) => ({ ...f, image: reader.result }));
-    reader.readAsDataURL(file);
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(filePath, file, { cacheControl: "3600", upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage.from("product-images").getPublicUrl(filePath);
+      setForm((f) => ({ ...f, image: data.publicUrl }));
+    } catch (err) {
+      console.error("Error subiendo imagen:", err?.message || err);
+      alert("No se pudo subir la imagen:\n\n" + (err?.message || "Error desconocido"));
+    } finally {
+      setUploading(false);
+    }
   };
 
   const valid = form.name.trim() && form.price !== "" && form.stock !== "";
@@ -53,8 +71,10 @@ export default function ProductForm({ initial, onSave, onCancel }) {
 
         <div className="nt-full">
           <label className="nt-label">Imagen del producto</label>
-          <div className="nt-dropzone" onClick={() => fileRef.current?.click()}>
-            {form.image ? (
+          <div className="nt-dropzone" onClick={() => !uploading && fileRef.current?.click()} style={{ opacity: uploading ? 0.6 : 1, cursor: uploading ? "wait" : "pointer" }}>
+            {uploading ? (
+              <span>Subiendo imagen…</span>
+            ) : form.image ? (
               <img src={form.image} alt="preview" style={{ width: 90, height: 90, objectFit: "cover", borderRadius: 8 }} />
             ) : (
               <><Upload size={18} /><span>Haz clic para subir una imagen</span></>
@@ -69,7 +89,7 @@ export default function ProductForm({ initial, onSave, onCancel }) {
         <button className="nt-btn-ghost" onClick={onCancel}>Cancelar</button>
         <button
           className="nt-btn-primary"
-          disabled={!valid}
+          disabled={!valid || uploading}
           onClick={() => onSave({ ...form, price: Number(form.price) || 0, stock: Number(form.stock) || 0 })}
         >
           Guardar producto

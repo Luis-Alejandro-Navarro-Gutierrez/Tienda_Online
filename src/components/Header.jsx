@@ -1,4 +1,3 @@
-import { useState, useEffect, useRef } from "react";
 import { ShoppingCart, Search, Lock } from "lucide-react";
 import { CATEGORIES } from "../data/products";
 
@@ -13,24 +12,6 @@ export default function Header({
   setActiveCat,
   onLogout,
 }) {
-  const [hidden, setHidden] = useState(false);
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      // Solo ocultamos después de bajar un poco, para evitar parpadeo cerca del tope de la página
-      if (currentY > lastScrollY.current && currentY > 120) {
-        setHidden(true);
-      } else {
-        setHidden(false);
-      }
-      lastScrollY.current = currentY;
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   const handleAdminToggle = () => {
     if (view === "admin") {
       if (onLogout) onLogout();
@@ -41,10 +22,7 @@ export default function Header({
   };
 
   return (
-    <header
-      className="nt-header"
-      style={{ transform: hidden ? "translateY(-100%)" : "translateY(0)", transition: "transform 0.3s ease" }}
-    >
+    <header className="nt-header">
       <div className="nt-container">
         {/* Barra superior */}
         <div className="nt-header-top">
